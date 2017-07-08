@@ -2,9 +2,7 @@
 
 import mongoose from 'mongoose';
 
-const Scheme = mongoose.Scheme;
-
-const staticScheme = new Scheme({
+const staticScheme = new mongoose.Schema({
 	date: String, // 定义一个属性data，类型为String
 	origin: String,
 	id: Number,

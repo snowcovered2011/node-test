@@ -1,6 +1,7 @@
 // 基础组件，其他从基础组件继承
 
 import fetch from 'node-fetch';// 接口请求
+import Ids from '../models/ids';
 import formidable from 'formidable'; // 表单模块
 import path from 'path';
 import fs from 'fs';
@@ -15,6 +16,7 @@ export default class BaseComponent {
 		this.uploadImg = this.uploadImg.bind(this)
 		this.qiniu = this.qiniu.bind(this)
 	}
+	// 接口请求封装
 	async fetch (url = '', data = {}, type = 'GET', resType = 'JSON') {
 		type = type.toUpperCase();
 		resType = resType.toUpperCase();
@@ -60,5 +62,55 @@ export default class BaseComponent {
 			throw new Error('id类型错误');
 			return
 		}
+		try {
+			const idData = await Ids.findOne();
+			idData[type]++;
+			// 保存起来
+			await idData.save();
+			return idData[type];
+		} catch (err) {
+			console.log('获取ID数据失败');
+			throw new Error(err);
+		}
+	}
+	async uploadImg (req, res, next) {
+		// 获取请求里面图片类型
+		const type = req.params.type;
+		try {
+			const image_path = await this.qiniu(req, type);
+			res.send({
+				status: 1,
+				image_path,
+			});
+		} catch (err) {
+			console.log('上传图片失败', err);
+			res.send({
+				status: 0,
+				type: 'ERROR_UPLOAD_IMG',
+				message: '上传图片失败',
+			})
+		}
+	}
+	async qiniu (req, type = 'default') {
+		return new Promise((resolve, reject) => {
+			const form = formidable.IncomingForm();
+			form.uploadDir = './public/img/' + type;
+			// form表单解析
+			form.parse(req, async (err, fields, files) => {
+				let img_id;
+				try{
+					img_id = await this.getId('img_id');
+				} catch (err) {
+					console.log('获取图片id失败');
+					// 删除文件操作
+					fs.unlink(files.file.path);
+					reject('获取图片id失败');
+				}
+				const imgName = (new Date().getTime() + Math.ceil(Math.random()*10000)).toString(16) + img_id;
+				const extname = path.extname(files.file.name);
+				const repath = './public/img/' + type + '/' + imgName + extname;
+				
+			})
+		})
 	}
 }
