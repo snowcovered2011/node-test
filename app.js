@@ -1,15 +1,16 @@
 'use strict';
 
 import express from 'express';
-import path from 'path';
-import history from 'connect-history-api-fallback';
-import connectMongo from 'connect-mongo';
+import db from './mongodb/db.js';
+import config from 'config-lite';
+import router from './routes/index';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
-import config from 'config-lite';
+import connectMongo from 'connect-mongo';
 import winston from 'winston';
 import expressWinston from 'express-winston';
-import router from './routes/index';
+import path from 'path';
+import history from 'connect-history-api-fallback';
 import Statistic from './middlewares/statistic';
 
 const app = express();
@@ -42,7 +43,7 @@ app.use(session({
 	})
 }));
 
-// 打印日志（成功的）
+// 打印日志（成功的）(写法顺序不能错)
 app.use(expressWinston.logger({
     transports: [
         new (winston.transports.Console)({
