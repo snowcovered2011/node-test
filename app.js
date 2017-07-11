@@ -11,7 +11,6 @@ import winston from 'winston';
 import expressWinston from 'express-winston';
 import path from 'path';
 import history from 'connect-history-api-fallback';
-import Statistic from './middlewares/statistic';
 
 const app = express();
 
@@ -29,7 +28,6 @@ app.all('*', (req, res, next) => {
 	}
 });
 
-app.use(Statistic.apiRecord);
 const MongoStore = connectMongo(session);
 app.use(cookieParser());
 app.use(session({
@@ -76,7 +74,7 @@ app.use(history());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use((err, req, res, next) => {
 	// send error message
 	res.status(err.status || 500).send('系统错误，未找到当前路由');
 });

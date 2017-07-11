@@ -1,9 +1,10 @@
-var express = require('express');
-var router = express.Router();
+import express from 'express';
+import userC from '../controller/users.js';
+const router = express.Router();
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
+router.get('/save', userC.saveData);
+router.get('/find', userC.findData);
+router.get('/update', userC.updateData);
+router.get('/remove', userC.removeData);
 
 module.exports = router;
