@@ -8,13 +8,13 @@ class UserInfo {
 	}
 	// 增
 	async saveData (req, res, next) {
-		await let userData = new userModel({
+		let userData = new userModel({
 			name: 'yanlihui',
 			age: 27,
 			hobit: 'IT',
 			describe: 'love u everyday'
 		});
-		userData.save((err, docs) => {
+		await userData.save((err, docs) => {
 			if (err) {
 				res.send({
 					code: '888888',
